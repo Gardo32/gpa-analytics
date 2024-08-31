@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPA Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            color: #2196f3;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        input[type="number"] {
+            width: calc(50% - 10px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .subject-input {
+            display: flex;
+            justify-content: space-between;
+        }
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+        }
+        .add-button {
+            background-color: #2196f3;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .add-button:hover {
+            background-color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GPA Calculator</h1>
+        <label for="num-subjects">Enter the number of subjects:</label>
+        <input type="number" id="num-subjects" min="1" placeholder="Number of subjects">
+        <button class="add-button" onclick="updateSubjects()">Add Subjects</button>
+        <div id="subject-container"></div>
+        <button onclick="calculateGPA()">Calculate GPA</button>
+        <div class="result" id="result">Your GPA is: N/A</div>
+    </div>
+
+    <script>
+        function updateSubjects() {
+            const numSubjects = document.getElementById('num-subjects').value;
+            const container = document.getElementById('subject-container');
+            container.innerHTML = ''; // Clear previous inputs
+
+            for (let i = 1; i <= numSubjects; i++) {
+                const subjectDiv = document.createElement('div');
+                subjectDiv.className = 'subject-input';
+                subjectDiv.innerHTML = `
+                    <input type="number" id="marks-${i}" placeholder="Marks for subject ${i}" min="0" max="100">
+                    <input type="number" id="hours-${i}" placeholder="Hours for subject ${i}" min="1">
+                `;
+                container.appendChild(subjectDiv);
+            }
+        }
+
+        function calculateGPA() {
+            const numSubjects = document.getElementById('num-subjects').value;
+            let totalMarks = 0;
+            let totalHours = 0;
+
+            for (let i = 1; i <= numSubjects; i++) {
+                const marks = parseFloat(document.getElementById(`marks-${i}`).value);
+                const hours = parseFloat(document.getElementById(`hours-${i}`).value);
+
+                if (!isNaN(marks) && !isNaN(hours)) {
+                    totalMarks += marks * hours;
+                    totalHours += hours;
+                }
+            }
+
+            const gpa = totalMarks / totalHours;
+            document.getElementById('result').innerText = `Your GPA is: ${gpa.toFixed(2)}`;
+        }
+    </script>
+</body>
+</html>

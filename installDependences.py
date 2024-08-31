@@ -1,6 +1,6 @@
 import os
 
-deps = ['streamlit','pyinstaller']
+deps = ['streamlit','st-supabase-connection','pandas']
 
 os.system("pip install uv")
 
