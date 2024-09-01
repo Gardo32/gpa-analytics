@@ -1,16 +1,39 @@
+import os
+import json
+import zipfile
+import pandas as pd
 import streamlit as st
 from gpa_functions import *
+
+
 def main():
     st.title("GPA Calculator")
+
+    # Initialize session state variables
+    if 'presets' not in st.session_state:
+        st.session_state.presets = {}
+    if 'selected_preset' not in st.session_state:
+        st.session_state.selected_preset = ""
+    if 'num_subjects' not in st.session_state:
+        st.session_state.num_subjects = 0
+    if 'subjects' not in st.session_state:
+        st.session_state.subjects = []
+    if 'hours' not in st.session_state:
+        st.session_state.hours = []
+    if 'grades' not in st.session_state:
+        st.session_state.grades = []
+
+    # Sidebar for navigation
+    st.sidebar.header("Navigation")
 
     # Preset management
     st.sidebar.header("Manage Presets")
 
-    # File upload
+    # Preset file upload
     uploaded_file = st.sidebar.file_uploader("Upload a Preset JSON file", type="json")
     if uploaded_file:
         preset_data = load_preset_from_file(uploaded_file)
-        preset_name = st.text_input("Enter a name for the uploaded preset:", "")
+        preset_name = st.sidebar.text_input("Enter a name for the uploaded preset:", "")
         if preset_name:
             st.session_state.presets[preset_name] = {
                 'num_subjects': preset_data.get('num_subjects', 0),
@@ -21,17 +44,20 @@ def main():
             st.success(f"Preset '{preset_name}' loaded successfully!")
 
     # Preset selection
-    preset_name = st.sidebar.radio("Select or Create Preset:", list(st.session_state.presets.keys()), index=list(st.session_state.presets.keys()).index(st.session_state.selected_preset))
+    preset_name = st.sidebar.radio("Select or Create Preset:", list(st.session_state.presets.keys()),
+                                   index=list(st.session_state.presets.keys()).index(st.session_state.selected_preset))
     st.session_state.selected_preset = preset_name
     apply_preset(preset_name)
 
     # Input for number of subjects
-    num_subjects = st.number_input("Enter the number of subjects:", min_value=0, value=st.session_state.num_subjects, step=1)
+    num_subjects = st.number_input("Enter the number of subjects:", min_value=0, value=st.session_state.num_subjects,
+                                   step=1)
     st.session_state.num_subjects = num_subjects
 
     # Ensure the session state lists have the correct length
     if len(st.session_state.subjects) < num_subjects:
-        st.session_state.subjects.extend([f"Subject {i + 1}" for i in range(len(st.session_state.subjects), num_subjects)])
+        st.session_state.subjects.extend(
+            [f"Subject {i + 1}" for i in range(len(st.session_state.subjects), num_subjects)])
     if len(st.session_state.hours) < num_subjects:
         st.session_state.hours.extend([1 for _ in range(len(st.session_state.hours), num_subjects)])
     if len(st.session_state.grades) < num_subjects:
@@ -70,20 +96,61 @@ def main():
         final_gpa = sum(total) / sum(st.session_state.hours)
         st.success(f"Your GPA is: {final_gpa:.2f}")
 
-        # Save and download preset buttons
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            if st.button('Save Grades and GPA'):
+        # File upload for appending new grades
+        uploaded_zip = st.file_uploader("Upload a ZIP file to append new grades:", type="zip")
+        if uploaded_zip:
+            append_grades_from_zip(uploaded_zip)
+            st.success("Grades appended successfully!")
+            st.download_button(
+                label="Download Updated ZIP File",
+                data=open("updated_gpa.zip", 'rb').read(),
+                file_name="updated_gpa.zip",
+                mime="application/zip"
+            )
+
+        # Save Grades and GPA button with dropdown
+        action = st.selectbox("Choose an action:", ["Download Mode", "Append Grades and GPA"])
+        if st.button('Execute Action'):
+            if action == "Save Grades and GPA":
+                # Save the grades and GPA to CSV files
                 save_grades_to_csv(st.session_state.subjects, st.session_state.grades, final_gpa)
                 save_marks_hours_to_csv(st.session_state.subjects, st.session_state.grades, st.session_state.hours)
-        with col2:
-            preset_json = save_preset_to_file(st.session_state.selected_preset, st.session_state.subjects, st.session_state.hours, num_subjects)
-            st.download_button(
-                label="Download Current Preset",
-                data=preset_json,
-                file_name=f"{st.session_state.selected_preset}.json",
-                mime="application/json"
-            )
+
+                # Create ZIP file
+                zip_file_path = create_zip_with_csv()
+
+                # Provide download button for ZIP file
+                with open(zip_file_path, 'rb') as file:
+                    st.download_button(
+                        label="Download gpa.zip",
+                        data=file.read(),
+                        file_name="gpa.zip",
+                        mime="application/zip"
+                    )
+
+                # Remove files after download
+                for file_name in [zip_file_path, "csv/mark_hours/Marks_Hours.csv", "csv/grades/Grade.csv"]:
+                    if os.path.exists(file_name):
+                        os.remove(file_name)
+
+            elif action == "Append Grades and GPA":
+                if uploaded_zip:
+                    append_grades_from_zip(uploaded_zip)
+                    st.download_button(
+                        label="Download Updated ZIP File",
+                        data=open("updated_gpa.zip", 'rb').read(),
+                        file_name="updated_gpa.zip",
+                        mime="application/zip"
+                    )
+
+        # Download current preset button
+        st.sidebar.download_button(
+            label="Download Current Preset",
+            data=save_preset_to_file(st.session_state.selected_preset, st.session_state.subjects,
+                                     st.session_state.hours, st.session_state.num_subjects),
+            file_name=f"{st.session_state.selected_preset}.json",
+            mime="application/json"
+        )
 
     else:
         st.warning("No subjects entered. Please add at least one subject.")
