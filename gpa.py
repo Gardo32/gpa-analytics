@@ -18,12 +18,28 @@ if 'hours' not in st.session_state:
 if 'grades' not in st.session_state:
     st.session_state.grades = []
 
+
 def save_preset(preset_name, subjects, hours, num_subjects):
     st.session_state.presets[preset_name] = {
         'num_subjects': num_subjects,
         'subjects': subjects,
         'hours': hours
     }
+
+
+def load_preset_from_file(uploaded_file):
+    preset_data = json.load(uploaded_file)
+    return preset_data
+
+
+def save_preset_to_file(preset_name, subjects, hours, num_subjects):
+    preset_data = {
+        'num_subjects': num_subjects,
+        'subjects': subjects,
+        'hours': hours
+    }
+    return json.dumps(preset_data)
+
 
 def apply_preset(preset_name):
     if preset_name in st.session_state.presets:
@@ -33,21 +49,42 @@ def apply_preset(preset_name):
         st.session_state.hours = list(preset_data.get('hours', []))
         st.session_state.grades = [0] * st.session_state.num_subjects
 
+
 def main():
     st.title("GPA Calculator")
 
+    # Preset management
+    st.sidebar.header("Manage Presets")
+
+    # File upload
+    uploaded_file = st.sidebar.file_uploader("Upload a Preset JSON file", type="json")
+    if uploaded_file:
+        preset_data = load_preset_from_file(uploaded_file)
+        preset_name = st.text_input("Enter a name for the uploaded preset:", "")
+        if preset_name:
+            st.session_state.presets[preset_name] = {
+                'num_subjects': preset_data.get('num_subjects', 0),
+                'subjects': preset_data.get('subjects', []),
+                'hours': preset_data.get('hours', [])
+            }
+            st.session_state.selected_preset = preset_name
+            st.success(f"Preset '{preset_name}' loaded successfully!")
+
     # Preset selection
-    preset_name = st.radio("Select or Create Preset:", list(st.session_state.presets.keys()), index=list(st.session_state.presets.keys()).index(st.session_state.selected_preset))
+    preset_name = st.sidebar.radio("Select or Create Preset:", list(st.session_state.presets.keys()),
+                                   index=list(st.session_state.presets.keys()).index(st.session_state.selected_preset))
     st.session_state.selected_preset = preset_name
     apply_preset(preset_name)
 
     # Input for number of subjects
-    num_subjects = st.number_input("Enter the number of subjects:", min_value=0, value=st.session_state.num_subjects, step=1)
+    num_subjects = st.number_input("Enter the number of subjects:", min_value=0, value=st.session_state.num_subjects,
+                                   step=1)
     st.session_state.num_subjects = num_subjects
 
     # Ensure the session state lists have the correct length
     if len(st.session_state.subjects) < num_subjects:
-        st.session_state.subjects.extend([f"Subject {i + 1}" for i in range(len(st.session_state.subjects), num_subjects)])
+        st.session_state.subjects.extend(
+            [f"Subject {i + 1}" for i in range(len(st.session_state.subjects), num_subjects)])
     if len(st.session_state.hours) < num_subjects:
         st.session_state.hours.extend([1 for _ in range(len(st.session_state.hours), num_subjects)])
     if len(st.session_state.grades) < num_subjects:
@@ -86,20 +123,29 @@ def main():
         final_gpa = sum(total) / sum(st.session_state.hours)
         st.success(f"Your GPA is: {final_gpa:.2f}")
 
-        # Create a row for Save Grades and Save Preset buttons
+        # Save and download preset buttons
         col1, col2 = st.columns([1, 1])
         with col1:
-            if st.button('Save Grades and GPA'):
-                save_grades_to_csv(st.session_state.subjects, st.session_state.grades, final_gpa)
-        with col2:
             if st.button('Save Preset'):
                 preset_name = st.text_input("Enter a name for the new preset:")
                 if preset_name and preset_name not in st.session_state.presets:
                     save_preset(preset_name, st.session_state.subjects, st.session_state.hours, num_subjects)
                     st.session_state.selected_preset = preset_name
-                    st.radio("Select or Create Preset:", list(st.session_state.presets.keys()), index=list(st.session_state.presets.keys()).index(preset_name))
+                    st.sidebar.radio("Select or Create Preset:", list(st.session_state.presets.keys()),
+                                     index=list(st.session_state.presets.keys()).index(preset_name))
+                    st.success(f"Preset '{preset_name}' saved successfully!")
+        with col2:
+            preset_json = save_preset_to_file(st.session_state.selected_preset, st.session_state.subjects,
+                                              st.session_state.hours, num_subjects)
+            st.download_button(
+                label="Download Current Preset",
+                data=preset_json,
+                file_name=f"{st.session_state.selected_preset}.json",
+                mime="application/json"
+            )
     else:
         st.warning("No subjects entered. Please add at least one subject.")
+
 
 if __name__ == "__main__":
     main()
