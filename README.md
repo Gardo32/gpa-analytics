@@ -24,7 +24,7 @@ GPA Analytics is your go-to tool for tracking and enhancing your academic perfor
 
 ## ‎ 
 
-### Build
+### Build **(Recomended)**
 
 1. Clone the repository: 
    ```bash
