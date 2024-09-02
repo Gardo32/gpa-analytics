@@ -15,7 +15,14 @@ GPA Analytics is your go-to tool for tracking and enhancing your academic perfor
 1. Download the ZIP file from the [Releases page](https://github.com/Gardo32/gpa-analytics/releases).
 2. Extract the contents of the folder.
 3. Open a terminal in the extracted folder.
-4. Launch the app with: `streamlit run GPA-Calculator.py`.
+4. Launch the app with the following commands:
+   ```cmd
+   .venv\Scripts\activate # On Linux use: source .venv/bin/activate
+   streamlit run GPA-Calculator.py
+   ```
+5. Access the tool at [http://localhost:8501](http://localhost:8501).
+
+## ‎ 
 
 ### Build
 
@@ -23,15 +30,27 @@ GPA Analytics is your go-to tool for tracking and enhancing your academic perfor
    ```bash
    git clone https://github.com/Gardo32/gpa-analytics.git
    ```
-2. Install the required dependencies: 
+2. Navigate to the project directory:
+   ```bash
+   cd gpa-analytics
+   ```
+3. Create and activate a virtual environment:
+   ```bash
+   pip install virtualenv
+   python -m venv .venv
+   .venv\Scripts\activate  # On Linux use: source .venv/bin/activate
+   ```
+4. Install the required dependencies:
    ```bash
    python installDependences.py
    ```
-3. Run the application: 
+5. Run the application:
    ```bash
    streamlit run GPA-Calculator.py
    ```
-4. Access the tool at [http://localhost:8501](http://localhost:8501).
+6. Access the tool at [http://localhost:8501](http://localhost:8501).
+
+---
 
 ## Contributing
 
