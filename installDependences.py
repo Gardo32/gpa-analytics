@@ -1,6 +1,6 @@
 import os
 
-deps = ['streamlit', 'pandas','matplotlib']
+deps = ['streamlit', 'pandas','plotly']
 
 os.system("pip install uv")
 
