@@ -19,9 +19,7 @@ def main():
     marks_hours_data = load_data('csv/mark_hours/Marks_Hours.csv')
 
     # Calculate GPA Average from the Grades data
-    st.subheader("GPA Average")
     gpa_average = calculate_gpa_average(grades_data)
-    st.write(f"GPA Average: {gpa_average:.2f}")
 
     # Dropdown menu to select which table to view
     file_choice = st.selectbox("Choose table to view:", ["Grades.csv", "Marks_Hours.csv"])
@@ -29,9 +27,11 @@ def main():
     # Display the selected table
     if file_choice == "Grades.csv":
         st.subheader("Grades Table")
+        st.write(f"GPA Average: {gpa_average:.2f}")
         st.dataframe(grades_data, height=400)  # Increase table height
     elif file_choice == "Marks_Hours.csv":
         st.subheader("Totals Table")
+        st.write(f"GPA Average: {gpa_average:.2f}")
         st.dataframe(marks_hours_data, height=400)  # Increase table height
 
     # Display Charts
@@ -50,7 +50,7 @@ def main():
                 mode='lines+markers',  # 'lines' for just lines, 'markers' for markers, or 'lines+markers' for both
                 name='GPA'
             ))
-            fig.update_layout(title='GPA Over Time', xaxis_title='Date/Time', yaxis_title='GPA', height=400)
+            fig.update_layout(xaxis_title='Date/Time', yaxis_title='GPA', height=400)
             st.plotly_chart(fig, use_container_width=True)
 
     with col4:
