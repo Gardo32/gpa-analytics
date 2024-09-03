@@ -3,7 +3,11 @@ import pandas as pd
 import plotly.graph_objects as go
 
 def load_data(file_path):
-    return pd.read_csv(file_path)
+    try:
+        return pd.read_csv(file_path)
+    except FileNotFoundError:
+        st.error("File not found. Please save your grades in the GPA Calculator to get analytics.")
+        st.stop()
 
 def calculate_gpa_average(grades_data):
     total_sum = grades_data['GPA'].sum()
