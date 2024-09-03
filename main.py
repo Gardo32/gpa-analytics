@@ -78,7 +78,7 @@ def main():
                 save_marks_hours_to_csv(st.session_state.subjects, st.session_state.grades, st.session_state.hours)
         with col2:
             preset_json = save_preset_to_file(st.session_state.selected_preset, st.session_state.subjects, st.session_state.hours, num_subjects)
-            st.download_button(
+            st.sidebar.download_button(
                 label="Download Current Preset",
                 data=preset_json,
                 file_name=f"{st.session_state.selected_preset}.json",
