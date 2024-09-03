@@ -10,6 +10,8 @@ GPA Analytics is your go-to tool for tracking and enhancing your academic perfor
 
 ## Getting Started
 
+> PS: You need git and python installed on you system
+
 ### Download
 
 1. Download the ZIP file from the [Releases page](https://github.com/Gardo32/gpa-analytics/releases).
