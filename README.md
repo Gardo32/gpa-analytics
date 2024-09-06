@@ -10,9 +10,11 @@ GPA Analytics is your go-to tool for tracking and enhancing your academic perfor
 
 ## Getting Started
 
+> PS: You need git and python installed on you system
+
 ### Download
 
-1. Download the ZIP file from the [Releases page](https://github.com/Gardo32/gpa-analytics/releases).
+1. Download the ZIP file from the [Releases page](https://github.com/Gardo32/gpa-analytics/releases). (or the [repo](https://github.com/Gardo32/gpa-analytics/archive/refs/heads/master.zip) for the nightly version)
 2. Extract the contents of the folder.
 3. Open a terminal in the extracted folder.
 4. Launch the app with the following commands:
