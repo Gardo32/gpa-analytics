@@ -1,4 +1,3 @@
-import streamlit as st
 from gpa_functions import *
 def main():
     st.title("GPA Calculator")
