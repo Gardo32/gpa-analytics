@@ -1,8 +1,7 @@
 import random
 
 
-def final_exam_mark_estimation(start, finish, hour,mark):
-
+def final_exam_mark_estimation(start, finish, hour, mark):
     # Ensure valid range
     if start > finish:
         raise ValueError("Start should be less than or equal to finish.")
@@ -28,8 +27,12 @@ def final_exam_mark_estimation(start, finish, hour,mark):
     return selected_number
 
 
-# Example usage
-start = 1
-finish = 4
-for hour in range(1, 9):
-    print(final_exam_mark_estimation(start, finish, hour,40))
+def final_grade(grade, final, hour, type):
+    if type == 'f4':
+        result = ((grade / 100) * 60 + final) * hour
+        return result
+    elif type == 'f5':
+        result = ((grade / 100) * 50 + final) * hour
+        return result
+    else:
+        return 'Wrong Type'
