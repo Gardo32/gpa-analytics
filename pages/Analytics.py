@@ -37,8 +37,9 @@ def calculate_gpa_average(grades_data):
 def calculate_final_gpa(row, hours_row, start, finish, subjects_for_50):
     total_sum = 0
     for subject, grade, hour in zip(row.index[2:], row[2:], hours_row):
+        # Correct weightage assignment
         subject_type = 'f5' if subject in subjects_for_50 else 'f4'
-        final_exam = final_exam_mark_estimation(start, finish, hour, 40 if subject_type == 'f4' else 50)
+        final_exam = final_exam_mark_estimation(start, finish, hour, 50 if subject_type == 'f5' else 40)
         final_gpa = final_grade(grade, final_exam, hour, subject_type)
         total_sum += final_gpa
     gpa = total_sum / 40
@@ -99,10 +100,6 @@ def main():
         st.write(f"GPA Average: {gpa_average:.2f}")
         st.dataframe(hours_data, height=400)
 
-    # Calculate y-axis range for charts
-    y_min = max(0, grade_goal - 5)
-    y_max = 100
-
     # Display charts for Grades and Weightage
     col3, col4 = st.columns([2, 2])
 
@@ -154,7 +151,7 @@ def main():
             fig.update_layout(
                 xaxis_title='Date/Time',
                 yaxis_title='GPA',
-                yaxis=dict(range=[y_min, y_max]),
+                yaxis=dict(range=[max(0, grade_goal - 5), 100]),
                 height=400,
                 showlegend=True
             )
@@ -169,12 +166,43 @@ def main():
             fig.update_layout(showlegend=False, height=400)
             st.plotly_chart(fig, use_container_width=True)
 
-    # Final Estimation Chart
-    st.subheader("Final GPA Estimation")
+    # Advance Tweaking Expander
+    with st.expander("Advance Tweaking", expanded=False):
+        st.subheader("Edit Final Exam Marks Estimation")
+
+        # Create a DataFrame for final exam marks estimation
+        final_exam_marks_df = pd.DataFrame({
+            'Subject': hours_data.columns,
+            'Results': [final_exam_mark_estimation(start, finish, hours_data.loc[0, subject],
+                                                   50 if subject in subjects_for_50 else 40) for subject in
+                        hours_data.columns],
+        })
+
+        edited_df = st.data_editor(final_exam_marks_df, use_container_width=True)
+
+        # Update results based on edited values
+        new_start = start  # Maintain original start
+        new_finish = finish  # Maintain original finish
+        edited_df['Results'] = [final_exam_mark_estimation(new_start, new_finish, hours_data.loc[0, subject],
+                                                           50 if subject in subjects_for_50 else 40) for subject in
+                                edited_df['Subject']]
+
+        # Recalculate GPA over time with edited values
+        gpa_over_time = []
+        for index, row in grades_data.iterrows():
+            timestamp = row['Date/Time']
+            hours_row = [hours_data.loc[0, subject] for subject in edited_df['Subject']]
+            gpa = calculate_final_gpa(row, hours_row, new_start, new_finish, subjects_for_50)
+            gpa_over_time.append((timestamp, gpa))
+
+        gpa_df = pd.DataFrame(gpa_over_time, columns=['Date/Time', 'GPA'])
+        gpa_df['Date/Time'] = pd.to_datetime(gpa_df['Date/Time'])
+
+    # Final Estimation Chart outside the expander
+    st.subheader("Updated Final GPA Estimation")
 
     fig_final = go.Figure()
 
-    # Add GPA over time
     fig_final.add_trace(go.Scatter(
         x=gpa_df['Date/Time'],
         y=[grade_goal] * len(gpa_df),
@@ -197,7 +225,7 @@ def main():
         x=pd.concat([gpa_df['Date/Time'], gpa_df['Date/Time'][::-1]]),
         y=pd.concat([gpa_df['GPA'], pd.Series([grade_goal] * len(gpa_df))[::-1]]),
         fill='tozeroy',
-        fillcolor='rgba(0, 255, 0, 0.2)',  # Green fill for above goal
+        fillcolor='rgba(0, 255, 0, 0.2)',  # Green fill
         line=dict(color='rgba(255, 255, 255, 0)'),  # Transparent line
         showlegend=False
     ))
@@ -206,7 +234,7 @@ def main():
         x=pd.concat([gpa_df['Date/Time'], gpa_df['Date/Time'][::-1]]),
         y=pd.concat([pd.Series([grade_goal] * len(gpa_df)), gpa_df['GPA'][::-1]]),
         fill='tozeroy',
-        fillcolor='rgba(0, 255, 0, 0.2)',  # Green fill for below goal
+        fillcolor='rgba(0, 255, 0, 0.2)',  # Green fill
         line=dict(color='rgba(255, 255, 255, 0)'),  # Transparent line
         showlegend=False
     ))
@@ -214,7 +242,7 @@ def main():
     fig_final.update_layout(
         xaxis_title='Date/Time',
         yaxis_title='GPA',
-        yaxis=dict(range=[y_min, y_max]),
+        yaxis=dict(range=[max(0, grade_goal - 5), 100]),
         height=400,
         showlegend=True
     )
