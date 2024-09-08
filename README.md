@@ -13,7 +13,7 @@ GPA Analytics is your go-to tool for tracking and enhancing your academic perfor
 > PS: You need git and python installed on you system
 
 
-<a href="https://github.com/Gardo32/gpa-analytics/archive/refs/heads/master.zip"><img alt="Get it on GitHub" src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" width="150"></a>
+<a href="https://github.com/Gardo32/gpa-analytics/archive/refs/heads/master.zip"><img alt="Get it on GitHub" src="https://github.com/user-attachments/assets/2b708359-816a-4885-9293-4de5b33f91f0" width="150"></a>
 <a href="https://gitlab.com/Gardo32/gpa-analytics/-/archive/master/gpa-analytics-master.zip"><img alt="Get it on GitHub" src="https://github.com/user-attachments/assets/35b694dc-2a77-42c2-89b8-44715dc01fc0" width="250"></a>
 
 ### Download
