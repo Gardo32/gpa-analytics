@@ -3,7 +3,45 @@ import pandas as pd
 import plotly.graph_objects as go
 import os
 import json
-from algo import final_grade, final_exam_mark_estimation
+import random
+
+
+def final_exam_mark_estimation(start, finish, hour, mark):
+    # Ensure valid range
+    if start > finish:
+        raise ValueError("Start should be less than or equal to finish.")
+
+    # Calculate range size
+    range_size = finish - start + 1
+
+    # Calculate weights for each number in the range
+    weights = []
+    for i in range(start, finish + 1):
+        # For higher hours, give more weight to lower numbers
+        # For lower hours, give more weight to higher numbers
+        weight = 1 / (abs(i - start) + 1) if hour > (finish - start) / 2 else 1 / (abs(finish - i) + 1)
+        weights.append(weight)
+
+    # Normalize weights
+    total_weight = sum(weights)
+    normalized_weights = [w / total_weight for w in weights]
+
+    # Select a number based on the weighted distribution
+    selected_number = random.choices(range(start, finish + 1), weights=normalized_weights, k=1)[0]
+    selected_number = mark - selected_number
+    return selected_number
+
+
+def final_grade(grade, final, hour, type):
+    if type == 'f4':
+        result = ((grade / 100) * 60 + final) * hour
+        return result
+    elif type == 'f5':
+        result = ((grade / 100) * 50 + final) * hour
+        return result
+    else:
+        return 'Wrong Type'
+
 
 # Load data from a file
 def load_data(file_path):
@@ -12,6 +50,7 @@ def load_data(file_path):
     except FileNotFoundError:
         st.error("File not found. Please upload the required files.")
         st.stop()
+
 
 # Convert a JSON preset to CSV
 def convert_json_to_csv(json_data, csv_file_path):
@@ -26,12 +65,14 @@ def convert_json_to_csv(json_data, csv_file_path):
 
     df.to_csv(csv_file_path, index=False)
 
+
 # Calculate GPA average from Grades data
 def calculate_gpa_average(grades_data):
     total_sum = grades_data['GPA'].sum()
     num_entries = len(grades_data)
     gpa_average = total_sum / num_entries if num_entries > 0 else 0
     return gpa_average
+
 
 # Calculate final GPA based on grades and hours
 def calculate_final_gpa(row, hours_row, start, finish, subjects_for_50):
@@ -44,6 +85,7 @@ def calculate_final_gpa(row, hours_row, start, finish, subjects_for_50):
         total_sum += final_gpa
     gpa = total_sum / 40
     return gpa
+
 
 # Main function
 def main():
@@ -168,7 +210,6 @@ def main():
 
     # Advance Tweaking Expander
     with st.expander("Advance Tweaking", expanded=False):
-        st.subheader("Edit Final Exam Marks Estimation")
 
         # Create a DataFrame for final exam marks estimation
         final_exam_marks_df = pd.DataFrame({
@@ -248,6 +289,7 @@ def main():
     )
 
     st.plotly_chart(fig_final, use_container_width=True)
+
 
 if __name__ == "__main__":
     main()
