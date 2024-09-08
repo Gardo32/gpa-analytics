@@ -18,7 +18,7 @@ GPA Analytics is your go-to tool for tracking and enhancing your academic perfor
 
 ### Download
 
-1. Download the ZIP file from the Releases page On either Github or Gitlabs
+1. Download the ZIP file from the widgets above of either Github or Gitlabs.
 2. Extract the contents of the folder.
 3. Open a terminal in the extracted folder.
 4. Launch the app with the following commands:
@@ -36,7 +36,7 @@ GPA Analytics is your go-to tool for tracking and enhancing your academic perfor
    ```bash
    git clone https://github.com/Gardo32/gpa-analytics.git
    ```
-   or:
+   or
    ```bash
    git clone https://gitlab.com/Gardo32/gpa-analytics.git
    ```
@@ -59,6 +59,12 @@ GPA Analytics is your go-to tool for tracking and enhancing your academic perfor
    streamlit run GPA-Calculator.py
    ```
 6. Access the tool at [http://localhost:8501](http://localhost:8501).
+
+### Update
+1. Open the terminal in the gpa-analytics and run:
+```git
+git pull
+```
 
 ---
 
