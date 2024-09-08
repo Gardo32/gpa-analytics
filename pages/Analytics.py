@@ -96,7 +96,17 @@ def main():
     grades_csv_path = 'csv/grades/Grades.csv'
     hours_csv_path = 'csv/Hours/Hours.csv'
 
-    # Load data
+    # Check if the Hours CSV file exists
+    if not os.path.exists(hours_csv_path):
+        # File uploader to upload JSON file
+        uploaded_file = st.sidebar.file_uploader("Upload JSON file", type="json")
+
+        if uploaded_file is not None:
+            json_data = uploaded_file.read().decode("utf-8")
+            convert_json_to_csv(json_data, hours_csv_path)
+            st.sidebar.success('Preset JSON has been converted to CSV and saved.')
+
+    # Load data for both CSV files
     grades_data = load_data(grades_csv_path)
     marks_hours_data = load_data(os.path.join(base_csv_dir, 'Marks_Hours.csv'))
     hours_data = load_data(hours_csv_path)
