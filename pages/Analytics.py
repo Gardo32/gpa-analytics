@@ -116,7 +116,7 @@ def main():
     subjects_for_50 = st.sidebar.multiselect("Select subjects for 50-weighted GPA", subjects)
 
     # Grade goal input
-    grade_goal = st.sidebar.number_input("Grade Goal", min_value=0.0, max_value=100.0, value=50.0)
+    grade_goal = st.sidebar.number_input("Grade Goal", min_value=0.0, max_value=100.0, value=90.0)
 
     # Input range for final exam estimation
     start = st.sidebar.number_input("Minimum mistakes in finals", min_value=0)
