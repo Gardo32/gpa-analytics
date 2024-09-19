@@ -74,16 +74,24 @@ def calculate_gpa_average(grades_data):
     return gpa_average
 
 
-# Calculate final GPA based on grades and hours
-def calculate_final_gpa(row, hours_row, start, finish, subjects_for_50):
+def calculate_final_gpa(row, hours_row, start, finish, subjects_for_50, hour_df):
     total_sum = 0
+    total_hours = 0  # To accumulate hours used for weighting
     for subject, grade, hour in zip(row.index[2:], row[2:], hours_row):
         # Correct weightage assignment
         subject_type = 'f5' if subject in subjects_for_50 else 'f4'
+
+        # Estimate the final exam mark based on the subject type
         final_exam = final_exam_mark_estimation(start, finish, hour, 50 if subject_type == 'f5' else 40)
+
+        # Calculate the final GPA for the subject
         final_gpa = final_grade(grade, final_exam, hour, subject_type)
+
+        # Accumulate the weighted GPA
         total_sum += final_gpa
-    gpa = total_sum / 40
+        total_hours += hour  # Accumulate the total hours for normalization
+
+    gpa = total_sum / total_hours if total_hours != 0 else 0
     return gpa
 
 
@@ -127,7 +135,7 @@ def main():
     for index, row in grades_data.iterrows():
         timestamp = row['Date/Time']
         hours_row = hours_data.iloc[0].values
-        gpa = calculate_final_gpa(row, hours_row, start, finish, subjects_for_50)
+        gpa = calculate_final_gpa(row, hours_row, start, finish, subjects_for_50,hours_csv_path)
         gpa_over_time.append((timestamp, gpa))
 
     gpa_df = pd.DataFrame(gpa_over_time, columns=['Date/Time', 'GPA'])
@@ -243,7 +251,7 @@ def main():
         for index, row in grades_data.iterrows():
             timestamp = row['Date/Time']
             hours_row = [hours_data.loc[0, subject] for subject in edited_df['Subject']]
-            gpa = calculate_final_gpa(row, hours_row, new_start, new_finish, subjects_for_50)
+            gpa = calculate_final_gpa(row, hours_row, new_start, new_finish, subjects_for_50,hours_csv_path)
             gpa_over_time.append((timestamp, gpa))
 
         gpa_df = pd.DataFrame(gpa_over_time, columns=['Date/Time', 'GPA'])
