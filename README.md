@@ -21,12 +21,21 @@ GPA Analytics is your go-to tool for tracking and enhancing your academic perfor
 1. Download the ZIP file from the widgets above of either Github or Gitlabs.
 2. Extract the contents of the folder.
 3. Open a terminal in the extracted folder.
-4. Launch the app with the following commands:
-   ```cmd
-   .venv\Scripts\activate # On Linux use: source .venv/bin/activate
+4. Create and activate a virtual environment:
+   ```bash
+   pip install virtualenv
+   python -m venv .venv
+   .venv\Scripts\activate  # On Linux use: source .venv/bin/activate
+   ```
+5. Install the required dependencies:
+   ```bash
+   python installDependences.py
+   ```
+6. Run the application:
+   ```bash
    streamlit run GPA-Calculator.py
    ```
-5. Access the tool at [http://localhost:8501](http://localhost:8501).
+7. Access the tool at [http://localhost:8501](http://localhost:8501).
 
 ## ‎ 
 
