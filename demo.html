@@ -35,7 +35,7 @@
             font-size: 14px;
             margin-bottom: 8px;
         }
-        input[type="number"] {
+        input[type="number"], input[type="text"] {
             width: calc(50% - 10px);
             padding: 10px;
             margin-bottom: 15px;
@@ -74,20 +74,109 @@
         .add-button:hover {
             background-color: #1976d2;
         }
+        select {
+            padding: 10px;
+            margin-bottom: 15px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>GPA Calculator</h1>
+        
+        <label for="preset-selector">Select a preset:</label>
+        <select id="preset-selector" onchange="loadPreset()">
+            <option value="">-- Select a preset --</option>
+            <option value="CCP">CCP</option>
+            <option value="SEC">SEC</option>
+            <option value="AI">AI</option>
+        </select>
+
         <label for="num-subjects">Enter the number of subjects:</label>
         <input type="number" id="num-subjects" min="1" placeholder="Number of subjects">
         <button class="add-button" onclick="updateSubjects()">Add Subjects</button>
+        
         <div id="subject-container"></div>
+        
         <button onclick="calculateGPA()">Calculate GPA</button>
         <div class="result" id="result">Your GPA is: N/A</div>
     </div>
 
     <script>
+        // Sample JSON presets
+        const presets = {
+            CCP: {
+                num_subjects: 11,
+                subjects: [
+                    "GRD301",
+                    "Math",
+                    "Islam",
+                    "Arab",
+                    "IOT 301",
+                    "Chemistry",
+                    "History",
+                    "English",
+                    "ARC 301",
+                    "Physics",
+                    "CC 301"
+                ],
+                hours: [4, 5, 1, 2, 4, 2, 2, 8, 4, 4, 4]
+            },
+            SEC: {
+                num_subjects: 11,
+                subjects: [
+                    "GRD301",
+                    "Math",
+                    "Islam",
+                    "Arab",
+                    "IOT 301",
+                    "Chemistry",
+                    "History",
+                    "English",
+                    "GDV 301",
+                    "Physics",
+                    "SEC 301"
+                ],
+                hours: [4, 5, 1, 2, 4, 2, 2, 8, 4, 4, 4]
+            },
+            AI: {
+                num_subjects: 11,
+                subjects: [
+                    "GRD301",
+                    "Math",
+                    "Islam",
+                    "Arab",
+                    "IOT 301",
+                    "Chemistry",
+                    "History",
+                    "English",
+                    "ML 301",
+                    "Physics",
+                    "DP 301"
+                ],
+                hours: [4, 5, 1, 2, 4, 2, 2, 8, 4, 4, 4]
+            }
+        };
+
+        function loadPreset() {
+            const selectedPreset = document.getElementById('preset-selector').value;
+            const preset = presets[selectedPreset];
+
+            if (preset) {
+                document.getElementById('num-subjects').value = preset.num_subjects;
+                updateSubjects(); // Call to update inputs based on number of subjects
+
+                preset.subjects.forEach((subject, index) => {
+                    document.getElementById(`subject-name-${index + 1}`).value = subject; // Populate subject names
+                    document.getElementById(`marks-${index + 1}`).value = ''; // Clear existing values for marks
+                    document.getElementById(`hours-${index + 1}`).value = preset.hours[index];
+                });
+            }
+        }
+
         function updateSubjects() {
             const numSubjects = document.getElementById('num-subjects').value;
             const container = document.getElementById('subject-container');
@@ -97,6 +186,7 @@
                 const subjectDiv = document.createElement('div');
                 subjectDiv.className = 'subject-input';
                 subjectDiv.innerHTML = `
+                    <input type="text" id="subject-name-${i}" placeholder="Subject ${i}" required>
                     <input type="number" id="marks-${i}" placeholder="Marks for subject ${i}" min="0" max="100">
                     <input type="number" id="hours-${i}" placeholder="Hours for subject ${i}" min="1">
                 `;
@@ -119,7 +209,7 @@
                 }
             }
 
-            const gpa = totalMarks / totalHours;
+            const gpa = totalHours > 0 ? (totalMarks / totalHours) : 0; // Prevent division by zero
             document.getElementById('result').innerText = `Your GPA is: ${gpa.toFixed(2)}`;
         }
     </script>
